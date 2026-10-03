@@ -6,6 +6,7 @@ import type {
   TemplateDetail,
   TemplateListItem,
   User,
+  Meta
 } from "@/types/api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
@@ -24,17 +25,16 @@ export class HttpError extends Error {
 async function request<T>(
   path: string,
   init: RequestInit = {},
-): Promise<{ data: T; meta?: ApiResponse<T> extends { meta?: infer M } ? M : undefined }> {
+): Promise<{ data: T; meta?: Meta }> {
   const res = await fetch(`${BASE_URL}${path}`, {
     ...init,
-    credentials: "include",        // ← send httpOnly cookies
+    credentials: "include",
     headers: {
       ...(init.body ? { "Content-Type": "application/json" } : {}),
       ...(init.headers ?? {}),
     },
   });
 
-  // 204 No Content
   if (res.status === 204) {
     return { data: undefined as T };
   }
@@ -49,7 +49,7 @@ async function request<T>(
 
   return {
     data: (json as { data: T }).data,
-    meta: (json as { meta?: unknown }).meta as never,
+    meta: (json as { meta?: Meta }).meta,
   };
 }
 

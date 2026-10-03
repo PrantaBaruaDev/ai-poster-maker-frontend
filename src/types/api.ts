@@ -9,16 +9,18 @@ export interface User {
   createdAt: string;
 }
 
+export interface Meta {
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+}
+
 export interface ApiSuccess<T> {
   success: true;
   message?: string;
   data: T;
-  meta?: {
-    page?: number;
-    limit?: number;
-    total?: number;
-    totalPages?: number;
-  };
+  meta?: Meta;
 }
 
 export interface ApiError {
