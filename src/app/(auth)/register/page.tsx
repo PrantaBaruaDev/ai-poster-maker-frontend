@@ -6,8 +6,9 @@ import { z } from "zod";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useRegister } from "@/hooks/useAuth";
+import { Label } from "@/components/ui/label";
 
 const schema = z.object({
   name: z.string().min(2, "At least 2 characters").max(80),
@@ -36,46 +37,66 @@ export default function RegisterPage() {
     });
 
   return (
-    <Card>
-      <div className="mb-6 text-center">
-        <h1 className="text-2xl font-bold">Create an account</h1>
-        <p className="mt-1 text-sm text-slate-500">
-          Start making posters in seconds
-        </p>
-      </div>
+    <Card className="w-full max-w-md">
+      <CardHeader className="text-center">
+        <CardTitle className="text-2xl">Create an account</CardTitle>
+        <CardDescription>Start making posters in seconds</CardDescription>
+      </CardHeader>
 
+      <CardContent>
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-        <Input
-          id="name"
-          label="Full name"
-          placeholder="মোঃ করিম উদ্দিন"
-          {...register("name")}
-          error={errors.name?.message}
-        />
-        <Input
-          id="email"
-          type="email"
-          label="Email"
-          placeholder="you@example.com"
-          autoComplete="email"
-          {...register("email")}
-          error={errors.email?.message}
-        />
-        <Input
-          id="phone"
-          label="Phone (optional)"
-          placeholder="01712345678"
-          {...register("phone")}
-          error={errors.phone?.message}
-        />
-        <Input
-          id="password"
-          type="password"
-          label="Password"
-          autoComplete="new-password"
-          {...register("password")}
-          error={errors.password?.message}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="name">Full name</Label>
+          <Input
+            id="name"
+            placeholder="মোঃ করিম উদ্দিন"
+            {...register("name")}
+          />
+          {errors.name && (
+            <p className="text-xs text-destructive">{errors.name.message}</p>
+          )}
+        </div>
+
+
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input
+            id="email"
+            type="email"
+            placeholder="you@example.com"
+            autoComplete="email"
+            {...register("email")}
+          />
+          {errors.email && (
+            <p className="text-xs text-destructive">{errors.email.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="phone">Phone (optional)</Label>
+          <Input
+            id="phone"
+            placeholder="01712345678"
+            {...register("phone")}
+          />
+          {errors.phone && (
+            <p className="text-xs text-destructive">{errors.phone.message}</p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="password">Password</Label>
+          <Input
+            id="password"
+            type="password"
+            autoComplete="new-password"
+            {...register("password")}
+          />
+          {errors.password && (
+            <p className="text-xs text-destructive">{errors.password.message}</p>
+          )}
+        </div>
+
         <Button type="submit" className="w-full" disabled={signup.isPending}>
           {signup.isPending ? "Creating…" : "Create account"}
         </Button>
@@ -87,6 +108,7 @@ export default function RegisterPage() {
           Log in
         </Link>
       </p>
+      </CardContent>
     </Card>
   );
 }

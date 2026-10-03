@@ -55,6 +55,7 @@ export default function LoginPage() {
             <Input
               id="password"
               type="password"
+              placeholder="**********"
               autoComplete="current-password"
               {...register("password")}
             />
