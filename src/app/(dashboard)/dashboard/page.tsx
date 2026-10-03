@@ -38,11 +38,14 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild className="w-full">
-              <Link href="/create">
-                <PlusCircle className="mr-2 h-4 w-4" />
+            <Button render={
+              <Link href="/create" className="w-full flex items-center justify-center"/>
+            } 
+            className="w-full cursor-pointer"
+            nativeButton={false}
+            >
+              <PlusCircle className="mr-2 h-4 w-4" />
                 Start creating
-              </Link>
             </Button>
           </CardContent>
         </Card>
@@ -58,8 +61,12 @@ export default function DashboardPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <Button asChild variant="outline" className="w-full">
-              <Link href="/history">View history</Link>
+            <Button render={
+              <Link href="/history" className="w-full flex items-center justify-center"/>
+            } variant="outline" className="w-full cursor-pointer"
+            nativeButton={false}
+            > 
+              View history
             </Button>
           </CardContent>
         </Card>
