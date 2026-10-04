@@ -64,7 +64,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <Menu className="h-5 w-5" />
                 </Button>
               } 
-              nativeButton={false}
+              nativeButton={true}
             />
             <SheetContent side="left" className="w-64">
               <div className="mt-6 flex flex-col gap-1">
@@ -131,7 +131,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   </span>
                 </Button>
               }
-              nativeButton={false}
+              nativeButton={true}
             />
             <DropdownMenuContent align="end" className="w-56">
               <DropdownMenuGroup>

@@ -46,7 +46,7 @@ export default function HistoryPage() {
             {meta?.total ?? 0} total • Re-download or regenerate any time.
           </p>
         </div>
-        <Button render={<Link href="/create" />} nativeButton={false}>
+        <Button render={<Link href="/create" />} nativeButton={true}>
             <PlusCircle className="mr-2 h-4 w-4" />
             New poster
         </Button>
@@ -66,7 +66,7 @@ export default function HistoryPage() {
             <p className="mt-1 max-w-sm text-sm text-muted-foreground">
               Generate your first poster and it will show up here.
             </p>
-            <Button render={<Link href="/create"/>} nativeButton={false} className="mt-6">
+            <Button render={<Link href="/create"/>} nativeButton={true} className="mt-6">
               <PlusCircle className="mr-2 h-4 w-4" />
               Create poster
             </Button>
@@ -105,14 +105,14 @@ export default function HistoryPage() {
                 </CardHeader>
 
                 <CardContent className="flex items-center gap-2 pt-0">
-                  <Button render={<Link href={`/preview/${p.id}`}/>} nativeButton={false} variant="outline" size="sm" className="flex-1">
+                  <Button render={<Link href={`/preview/${p.id}`}/>} nativeButton={true} variant="outline" size="sm" className="flex-1">
                     <Eye className="mr-1.5 h-3.5 w-3.5" />
                     View
                   </Button>
 
                   <AlertDialog>
                     <AlertDialogTrigger render={ <Button variant="ghost" size="icon" className="text-destructive"/> }
-                      nativeButton={false}
+                      nativeButton={true}
                     >
                       <Trash2 className="h-4 w-4" />
                     </AlertDialogTrigger>

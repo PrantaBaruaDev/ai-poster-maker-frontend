@@ -16,21 +16,36 @@ import {
   Loader2,
   ImageIcon,
 } from "lucide-react";
+import { buildDownloadUrl, downloadAsBlob } from "@/lib/utils";
+import { toast } from "sonner";
+
 
 export default function PreviewPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params);
   const { data: poster, isLoading, isError, error } = usePoster(id);
   const regenerate = useRegeneratePoster(id);
 
-  const download = () => {
+  const download = async () => {
     if (!poster?.generatedImageUrl) return;
-    // Force download via a temporary anchor with download attribute
+
+    const filename = `poster-${poster.id}.png`;
+    const directUrl = buildDownloadUrl(poster.generatedImageUrl, filename);
+
+    if (directUrl === poster.generatedImageUrl) {
+      try {
+        await downloadAsBlob(poster.generatedImageUrl, filename);
+      } catch {
+        toast.error("Download failed. Try opening the image in a new tab.");
+      }
+      return;
+    }
+
     const a = document.createElement("a");
-    a.href = poster.generatedImageUrl;
-    a.download = `poster-${poster.id}.png`;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
+    a.href = directUrl;
+    a.download = filename;
+    document.body.appendChild(a);
     a.click();
+    a.remove();
   };
 
   return (
@@ -119,6 +134,8 @@ export default function PreviewPage({ params }: { params: Promise<{ id: string }
                 <Download className="mr-2 h-4 w-4" />
                 Download PNG
               </Button>
+
+
               <Button
                 variant="outline"
                 className="w-full"

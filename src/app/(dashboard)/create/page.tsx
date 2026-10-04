@@ -18,8 +18,12 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { TemplatePicker } from "@/components/poster/TemplatePicker";
-import { PhotoUploader } from "@/components/poster/PhotoUploader";
+import {
+  PhotoUploader,
+  type UploadedPhoto,
+} from "@/components/poster/PhotoUploader";
 import { useCreatePoster } from "@/hooks/usePosters";
+import { useTemplate } from "@/hooks/useTemplates";
 import { Loader2, Wand2 } from "lucide-react";
 import type { TemplateListItem } from "@/types/api";
 
@@ -36,11 +40,19 @@ const schema = z.object({
 
 type FormValues = z.infer<typeof schema>;
 
+const DEFAULT_MAX_PHOTOS = 3;
+
 export default function CreatePage() {
   const router = useRouter();
   const [template, setTemplate] = useState<TemplateListItem | null>(null);
-  const [photoUrls, setPhotoUrls] = useState<string[]>([]);
+  const [photos, setPhotos] = useState<UploadedPhoto[]>([]);
   const create = useCreatePoster();
+
+  // Fetch template detail to learn how many photo slots it accepts.
+  // The list endpoint only returns lightweight fields.
+  const { data: templateDetail } = useTemplate(template?.id);
+  const maxPhotos =
+    templateDetail?.layoutConfig?.photoSlots?.length ?? DEFAULT_MAX_PHOTOS;
 
   const {
     register,
@@ -60,6 +72,15 @@ export default function CreatePage() {
     },
   });
 
+  const handleTemplateChange = (next: TemplateListItem) => {
+    // Only clear photos when the template actually changes.
+    // This prevents silent over-limit submissions.
+    if (template && template.id !== next.id && photos.length > 0) {
+      setPhotos([]);
+    }
+    setTemplate(next);
+  };
+
   const onSubmit = async (values: FormValues) => {
     if (!template) return;
 
@@ -75,7 +96,8 @@ export default function CreatePage() {
         ...(values.slogan && { slogan: values.slogan }),
         ...(values.tribute && { tribute: values.tribute }),
       },
-      photoUrls,
+      photoUrls: photos.map((p) => p.url),
+      photoPublicIds: photos.map((p) => p.publicId),
     });
 
     router.push(`/preview/${res.data.posterId}`);
@@ -90,26 +112,29 @@ export default function CreatePage() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)} className="grid gap-6 lg:grid-cols-[1fr_360px]">
+      <form
+        onSubmit={handleSubmit(onSubmit)}
+        className="grid gap-6 lg:grid-cols-[1fr_360px]"
+      >
         <div className="space-y-6">
-          {/* Template */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">1. Choose a template</CardTitle>
-              <CardDescription>Match the occasion you&apos;re designing for.</CardDescription>
+              <CardTitle className="text-lg">Choose a template</CardTitle>
+              <CardDescription>
+                Match the occasion you&apos;re designing for.
+              </CardDescription>
             </CardHeader>
             <CardContent>
               <TemplatePicker
                 value={template?.id ?? null}
-                onChange={(t) => setTemplate(t)}
+                onChange={handleTemplateChange}
               />
             </CardContent>
           </Card>
 
-          {/* Details */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">2. Poster details</CardTitle>
+              <CardTitle className="text-lg">Poster details</CardTitle>
               <CardDescription>
                 These appear on the poster exactly as you type them.
               </CardDescription>
@@ -127,18 +152,28 @@ export default function CreatePage() {
                   {...register("headline")}
                 />
                 {errors.headline && (
-                  <p className="text-xs text-destructive">{errors.headline.message}</p>
+                  <p className="text-xs text-destructive">
+                    {errors.headline.message}
+                  </p>
                 )}
               </div>
 
               <div className="grid gap-4 sm:grid-cols-2">
                 <div className="space-y-2">
                   <Label htmlFor="subheadline">Subheadline</Label>
-                  <Input id="subheadline" placeholder="১৬ ডিসেম্বর" {...register("subheadline")} />
+                  <Input
+                    id="subheadline"
+                    placeholder="১৬ ডিসেম্বর"
+                    {...register("subheadline")}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="slogan">Slogan</Label>
-                  <Input id="slogan" placeholder="টেক ব্যাক বাংলাদেশ" {...register("slogan")} />
+                  <Input
+                    id="slogan"
+                    placeholder="টেক ব্যাক বাংলাদেশ"
+                    {...register("slogan")}
+                  />
                 </div>
               </div>
 
@@ -154,10 +189,9 @@ export default function CreatePage() {
             </CardContent>
           </Card>
 
-          {/* Requester */}
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">3. Requester info</CardTitle>
+              <CardTitle className="text-lg">Requester info</CardTitle>
               <CardDescription>
                 Shown on the poster and in the footer credit line.
               </CardDescription>
@@ -167,48 +201,74 @@ export default function CreatePage() {
                 <Label htmlFor="name">
                   Name <span className="text-destructive">*</span>
                 </Label>
-                <Input id="name" placeholder="মোঃ করিম উদ্দিন" {...register("name")} />
+                <Input
+                  id="name"
+                  placeholder="মোঃ করিম উদ্দিন"
+                  {...register("name")}
+                />
                 {errors.name && (
-                  <p className="text-xs text-destructive">{errors.name.message}</p>
+                  <p className="text-xs text-destructive">
+                    {errors.name.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="designation">
                   Designation <span className="text-destructive">*</span>
                 </Label>
-                <Input id="designation" placeholder="সাধারণ সম্পাদক" {...register("designation")} />
+                <Input
+                  id="designation"
+                  placeholder="সাধারণ সম্পাদক"
+                  {...register("designation")}
+                />
                 {errors.designation && (
-                  <p className="text-xs text-destructive">{errors.designation.message}</p>
+                  <p className="text-xs text-destructive">
+                    {errors.designation.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="party">
                   Party / Organization <span className="text-destructive">*</span>
                 </Label>
-                <Input id="party" placeholder="বাংলাদেশ আওয়ামী লীগ" {...register("party")} />
+                <Input
+                  id="party"
+                  placeholder="বাংলাদেশ আওয়ামী লীগ"
+                  {...register("party")}
+                />
                 {errors.party && (
-                  <p className="text-xs text-destructive">{errors.party.message}</p>
+                  <p className="text-xs text-destructive">
+                    {errors.party.message}
+                  </p>
                 )}
               </div>
               <div className="space-y-2">
                 <Label htmlFor="district">District / Union</Label>
-                <Input id="district" placeholder="ঢাকা" {...register("district")} />
+                <Input
+                  id="district"
+                  placeholder="ঢাকা"
+                  {...register("district")}
+                />
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* Sidebar */}
         <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">4. Photos</CardTitle>
+              <CardTitle className="text-lg">Photos</CardTitle>
               <CardDescription>
-                Add up to 3 leader photos. The first is the main portrait.
+                Add up to {maxPhotos} photo{maxPhotos === 1 ? "" : "s"}. The first
+                is the main portrait.
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <PhotoUploader urls={photoUrls} onChange={setPhotoUrls} max={3} />
+              <PhotoUploader
+                photos={photos}
+                onChange={setPhotos}
+                max={maxPhotos}
+              />
             </CardContent>
           </Card>
 
@@ -239,7 +299,8 @@ export default function CreatePage() {
               )}
               <Separator className="my-4" />
               <p className="text-xs text-muted-foreground">
-                Generation usually takes 5–10 seconds. You can tweak and regenerate up to 3 times.
+                Generation usually takes 5–10 seconds. You can tweak and
+                regenerate up to 3 times.
               </p>
             </CardContent>
           </Card>
