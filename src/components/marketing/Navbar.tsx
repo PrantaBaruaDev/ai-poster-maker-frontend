@@ -5,8 +5,7 @@ import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { cn } from "@/lib/utils";
-import { Menu, Sparkles, LayoutGrid } from "lucide-react";
+import { Menu, Sparkles, LayoutGrid, ShieldCheck } from "lucide-react";
 
 const NAV_LINKS = [
   { href: "#features", label: "Features" },
@@ -25,7 +24,7 @@ export function Navbar() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-primary to-primary/70 shadow-sm">
-            <Sparkles className="h-4.5 w-4.5 text-primary-foreground" />
+            <Sparkles className="h-4 w-4 text-primary-foreground" />
           </div>
           <div className="flex flex-col leading-none">
             <span className="font-[family-name:var(--font-headline)] text-base font-extrabold tracking-tight text-foreground">
@@ -55,10 +54,22 @@ export function Navbar() {
           {isLoading ? (
             <div className="h-9 w-24 animate-pulse rounded-md bg-muted" />
           ) : user ? (
-            <Button render={<Link href="/dashboard" />} nativeButton={false}>
-              <LayoutGrid className="mr-2 h-4 w-4" />
-              Dashboard
-            </Button>
+            <>
+              {user.role === "ADMIN" && (
+                <Button
+                  variant="outline"
+                  render={<Link href="/admin" />}
+                  nativeButton={false}
+                >
+                  <ShieldCheck className="mr-2 h-4 w-4" />
+                  Admin
+                </Button>
+              )}
+              <Button render={<Link href="/dashboard" />} nativeButton={false}>
+                <LayoutGrid className="mr-2 h-4 w-4" />
+                Dashboard
+              </Button>
+            </>
           ) : (
             <>
               <Button
@@ -100,27 +111,54 @@ export function Navbar() {
               <div className="my-3 h-px bg-border" />
 
               {user ? (
-                <Button
-                  render={<Link href="/dashboard" onClick={() => setOpen(false)} />}
-                  nativeButton={false}
-                  className="w-full"
-                >
-                  <LayoutGrid className="mr-2 h-4 w-4" />
-                  Dashboard
-                </Button>
+                <>
+                  {user.role === "ADMIN" && (
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      render={
+                        <Link
+                          href="/admin"
+                          onClick={() => setOpen(false)}
+                        />
+                      }
+                      nativeButton={false}
+                    >
+                      <ShieldCheck className="mr-2 h-4 w-4" />
+                      Admin Panel
+                    </Button>
+                  )}
+                  <Button
+                    className="w-full"
+                    render={
+                      <Link
+                        href="/dashboard"
+                        onClick={() => setOpen(false)}
+                      />
+                    }
+                    nativeButton={false}
+                  >
+                    <LayoutGrid className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Button>
+                </>
               ) : (
                 <div className="flex flex-col gap-2">
                   <Button
                     variant="outline"
                     className="w-full"
-                    render={<Link href="/login" onClick={() => setOpen(false)} />}
+                    render={
+                      <Link href="/login" onClick={() => setOpen(false)} />
+                    }
                     nativeButton={false}
                   >
                     Log in
                   </Button>
                   <Button
                     className="w-full"
-                    render={<Link href="/register" onClick={() => setOpen(false)} />}
+                    render={
+                      <Link href="/register" onClick={() => setOpen(false)} />
+                    }
                     nativeButton={false}
                   >
                     Get started
