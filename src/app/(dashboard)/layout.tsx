@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import { LayoutGrid, PlusCircle, History, LogOut, Loader2, Menu } from "lucide-react";
+import { LayoutGrid, PlusCircle, History, LogOut, Loader2, Menu, ShieldCheck } from "lucide-react";
 
 const NAV = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutGrid },
@@ -143,6 +143,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 </DropdownMenuLabel>
               </DropdownMenuGroup>
               <DropdownMenuSeparator />
+
+              {user.role === "ADMIN" && (
+                <>
+                  <DropdownMenuItem onClick={() => router.push("/admin/templates")}>
+                    <ShieldCheck className="mr-2 h-4 w-4" />
+                    Admin panel
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                </>
+              )}
+
               <DropdownMenuItem
                 onClick={() => logout.mutate()}
                 disabled={logout.isPending}
