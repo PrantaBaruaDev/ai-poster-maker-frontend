@@ -2,9 +2,9 @@
 
 Next.js 16 client for the AI Political Poster Maker. Consumes the Express API in `../backend/`. Provides a complete user workflow — register, create posters with photos and Bangla text, watch the AI compose them, download print-ready PNGs — plus a full admin panel for template management and content moderation.
 
-**Backend repo:** `../backend/` (Express + Prisma + Puppeteer + Gemini + Cloudinary)
+**Backend repo:** [AI Political Poster Maker Backend](https://github.com/PrantaBaruaDev/ai-poster-maker-backend.git) (Express + Prisma + Puppeteer + Gemini + Cloudinary)
 
-**Live deployment:** https://your-frontend.vercel.app
+**Live deployment:** https://ai-poster-maker-tau.vercel.app/
 
 ---
 
