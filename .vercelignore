@@ -1,0 +1,40 @@
+# Dependencies
+/node_modules
+
+# Next.js build output (Vercel builds this fresh)
+/.next/
+/out/
+
+# Environment files & secrets (DO NOT push secrets to deployment)
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Version control
+.git
+.gitignore
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE and OS metadata
+.DS_Store
+.vscode
+.idea
+
+# Testing & Coverage
+/coverage
+/cypress/videos
+/cypress/screenshots
+
+# Documentation & Design
+README.md
+AGENTS.md
+CLAUDE.md
+*.fig
+*.sketch
