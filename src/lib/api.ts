@@ -117,6 +117,7 @@ export const posterApi = {
     templateId: string;
     formData: PosterFormData;
     photoUrls: string[];
+    photoPublicIds: string[];
   }) =>
     request<{ posterId: string; status: string }>("/posters", {
       method: "POST",

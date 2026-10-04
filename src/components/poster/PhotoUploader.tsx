@@ -3,24 +3,29 @@
 import { useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Upload, X, Loader2, Image as ImageIcon } from "lucide-react";
+import { X, Loader2, Image as ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useUploadPhoto } from "@/hooks/usePosters";
 
+export interface UploadedPhoto {
+  url: string;
+  publicId: string;
+}
+
 interface Props {
-  urls: string[];
-  onChange: (urls: string[]) => void;
+  photos: UploadedPhoto[];
+  onChange: (photos: UploadedPhoto[]) => void;
   max?: number;
 }
 
-export function PhotoUploader({ urls, onChange, max = 3 }: Props) {
+export function PhotoUploader({ photos, onChange, max = 3 }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
   const upload = useUploadPhoto();
   const [dragOver, setDragOver] = useState(false);
 
   const handleFiles = async (files: FileList | File[]) => {
     const list = Array.from(files);
-    const remaining = max - urls.length;
+    const remaining = max - photos.length;
     if (remaining <= 0) {
       toast.error(`Maximum ${max} photos`);
       return;
@@ -38,14 +43,14 @@ export function PhotoUploader({ urls, onChange, max = 3 }: Props) {
       }
       try {
         const res = await upload.mutateAsync(file);
-        onChange([...urls, res.url]);
+        onChange([...photos, { url: res.url, publicId: res.publicId }]);
       } catch {
         /* toast already shown by hook */
       }
     }
   };
 
-  const remove = (url: string) => onChange(urls.filter((u) => u !== url));
+  const remove = (url: string) => onChange(photos.filter((p) => p.url !== url));
 
   return (
     <div className="space-y-3">
@@ -63,7 +68,7 @@ export function PhotoUploader({ urls, onChange, max = 3 }: Props) {
         className={cn(
           "flex flex-col items-center justify-center rounded-xl border-2 border-dashed p-6 text-center transition",
           dragOver ? "border-primary bg-primary/5" : "border-border",
-          urls.length >= max && "opacity-50",
+          photos.length >= max && "opacity-50",
         )}
       >
         <input
@@ -76,7 +81,7 @@ export function PhotoUploader({ urls, onChange, max = 3 }: Props) {
             if (e.target.files?.length) handleFiles(e.target.files);
             e.target.value = "";
           }}
-          disabled={urls.length >= max}
+          disabled={photos.length >= max}
         />
 
         <ImageIcon className="h-8 w-8 text-muted-foreground" />
@@ -86,13 +91,13 @@ export function PhotoUploader({ urls, onChange, max = 3 }: Props) {
             type="button"
             onClick={() => inputRef.current?.click()}
             className="text-primary underline-offset-2 hover:underline"
-            disabled={urls.length >= max}
+            disabled={photos.length >= max}
           >
             browse
           </button>
         </p>
         <p className="mt-1 text-xs text-muted-foreground">
-          Up to {max} photos • JPG / PNG / WebP • max 5 MB each
+          Up to {max} photo{max === 1 ? "" : "s"} • JPG / PNG / WebP • max 5 MB each
         </p>
 
         {upload.isPending && (
@@ -102,28 +107,25 @@ export function PhotoUploader({ urls, onChange, max = 3 }: Props) {
         )}
       </div>
 
-      {urls.length > 0 && (
+      {photos.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
-          {urls.map((url) => (
+          {photos.map((photo) => (
             <div
-              key={url}
+              key={photo.url}
               className="group relative aspect-square overflow-hidden rounded-lg border"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={url}
+                src={photo.url}
                 alt="Uploaded"
                 className="h-full w-full object-cover"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).style.opacity = "0.3";
-                }}
               />
               <Button
                 type="button"
                 variant="destructive"
                 size="icon"
                 className="absolute right-1 top-1 h-7 w-7 opacity-0 transition group-hover:opacity-100"
-                onClick={() => remove(url)}
+                onClick={() => remove(photo.url)}
               >
                 <X className="h-3.5 w-3.5" />
               </Button>
