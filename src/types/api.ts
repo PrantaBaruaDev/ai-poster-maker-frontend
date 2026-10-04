@@ -104,3 +104,40 @@ export interface PosterDetail {
     occasionType: OccasionType;
   };
 }
+
+
+export interface AdminTemplateListItem {
+  id: string;
+  slug: string;
+  title: string;
+  occasionType: OccasionType;
+  thumbnailUrl: string;
+  htmlTemplateKey: string;
+  layoutConfig: TemplateDetail["layoutConfig"];
+  isActive: boolean;
+  createdAt: string;
+  _count: { posters: number };
+}
+
+export interface CreateTemplateBody {
+  slug: string;
+  title: string;
+  occasionType: OccasionType;
+  thumbnailUrl: string;
+  htmlTemplateKey: string;
+  layoutConfig: TemplateDetail["layoutConfig"];
+  isActive?: boolean;
+}
+
+export type UpdateTemplateBody = Partial<Omit<CreateTemplateBody, "slug">>;
+
+export interface AdminPosterListItem {
+  id: string;
+  status: PosterStatus;
+  isFlagged: boolean;
+  generatedImageUrl: string | null;
+  formData: PosterFormData;
+  createdAt: string;
+  user: { id: string; name: string; email: string };
+  template: { id: string; title: string; occasionType: OccasionType };
+}

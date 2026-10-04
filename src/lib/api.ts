@@ -6,7 +6,11 @@ import type {
   TemplateDetail,
   TemplateListItem,
   User,
-  Meta
+  Meta,
+  AdminPosterListItem,
+  AdminTemplateListItem,
+  UpdateTemplateBody,
+  CreateTemplateBody
 } from "@/types/api";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:5000/api/v1";
@@ -132,4 +136,52 @@ export const posterApi = {
 
   delete: (id: string) =>
     request<void>(`/posters/${id}`, { method: "DELETE" }),
+};
+
+
+export const adminApi = {
+  // Templates
+  listTemplates: () =>
+    request<{ templates: AdminTemplateListItem[] }>("/admin/templates"),
+
+  createTemplate: (body: CreateTemplateBody) =>
+    request<{ template: AdminTemplateListItem }>("/admin/templates", {
+      method: "POST",
+      body: JSON.stringify(body),
+    }),
+
+  updateTemplate: (id: string, body: UpdateTemplateBody) =>
+    request<{ template: AdminTemplateListItem }>(`/admin/templates/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(body),
+    }),
+
+  deactivateTemplate: (id: string) =>
+    request<{ template: AdminTemplateListItem }>(`/admin/templates/${id}`, {
+      method: "DELETE",
+    }),
+
+  // Posters (moderation)
+  listPosters: (opts: { flagged?: boolean; page?: number; limit?: number } = {}) => {
+    const params = new URLSearchParams();
+    if (opts.flagged !== undefined) params.set("flagged", String(opts.flagged));
+    if (opts.page) params.set("page", String(opts.page));
+    if (opts.limit) params.set("limit", String(opts.limit));
+    const qs = params.toString();
+    return request<{ posters: AdminPosterListItem[] }>(
+      `/admin/posters${qs ? `?${qs}` : ""}`,
+    );
+  },
+
+  setPosterFlag: (id: string, isFlagged: boolean, reason?: string) =>
+    request<{ poster: { id: string; isFlagged: boolean } }>(
+      `/admin/posters/${id}/flag`,
+      {
+        method: "PATCH",
+        body: JSON.stringify({ isFlagged, ...(reason && { reason }) }),
+      },
+    ),
+
+  deletePoster: (id: string) =>
+    request<void>(`/admin/posters/${id}`, { method: "DELETE" }),
 };

@@ -32,7 +32,8 @@ export function useLogin() {
     onSuccess: (res) => {
       qc.setQueryData(AUTH_QUERY_KEY, res.data.user);
       toast.success("Logged in");
-      router.push("/dashboard");
+      const dest = res.data.user.role === "ADMIN" ? "/admin/templates" : "/dashboard";
+      router.push(dest);
     },
     onError: (err: Error) => toast.error(err.message),
   });
@@ -47,7 +48,8 @@ export function useRegister() {
     onSuccess: (res) => {
       qc.setQueryData(AUTH_QUERY_KEY, res.data.user);
       toast.success("Account created");
-      router.push("/dashboard");
+      const dest = res.data.user.role === "ADMIN" ? "/admin/templates" : "/dashboard";
+      router.push(dest);
     },
     onError: (err: Error) => toast.error(err.message),
   });
